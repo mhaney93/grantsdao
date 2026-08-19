@@ -25,25 +25,20 @@ contract Earner is AccessControlDefaultAdminRules, IEarner {
 
     /// @param admin   Address that receives DEFAULT_ADMIN_ROLE; grants RECORDER_ROLE.
     /// @param token_  Address of the GrantToken contract (must have MINTER_ROLE granted here).
-    constructor(address admin, address token_)
-        AccessControlDefaultAdminRules(0, admin)
-    {
+    constructor(address admin, address token_) AccessControlDefaultAdminRules(0, admin) {
         token = IGrantToken(token_);
 
         // Default reward amounts — adjustable via setReward.
-        _rewards[Action.Voted]             = 10e18;
+        _rewards[Action.Voted] = 10e18;
         _rewards[Action.ProposalSubmitted] = 50e18;
         _rewards[Action.MilestoneApproved] = 25e18;
-        _rewards[Action.Seeded]            = 10e18;
+        _rewards[Action.Seeded] = 10e18;
     }
 
     // ── IEarner ───────────────────────────────────────────────────────────────
 
     /// @inheritdoc IEarner
-    function recordAction(address participant, uint256 proposalId, Action action)
-        external
-        onlyRole(RECORDER_ROLE)
-    {
+    function recordAction(address participant, uint256 proposalId, Action action) external onlyRole(RECORDER_ROLE) {
         if (_recorded[participant][proposalId][action]) {
             revert AlreadyRecorded(participant, proposalId, action);
         }

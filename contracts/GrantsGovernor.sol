@@ -84,11 +84,10 @@ contract GrantsGovernor is
     // ── IGrantsGovernor ───────────────────────────────────────────────────────
 
     /// @inheritdoc IGrantsGovernor
-    function proposeGrantRelease(
-        uint256 grantId,
-        uint8 milestone,
-        string calldata description
-    ) external returns (uint256 proposalId) {
+    function proposeGrantRelease(uint256 grantId, uint8 milestone, string calldata description)
+        external
+        returns (uint256 proposalId)
+    {
         // Only one milestone-release proposal may be outstanding DAO-wide at a time.
         if (_activeMilestoneProposalId != 0) {
             ProposalState activeState = state(_activeMilestoneProposalId);
@@ -117,10 +116,7 @@ contract GrantsGovernor is
         values[0] = 0;
 
         bytes[] memory calldatas = new bytes[](1);
-        calldatas[0] = abi.encodeCall(
-            IGrantsTreasury.releaseMilestone,
-            (grantId, milestone, grant.grantee, usdSlice)
-        );
+        calldatas[0] = abi.encodeCall(IGrantsTreasury.releaseMilestone, (grantId, milestone, grant.grantee, usdSlice));
 
         proposalId = propose(targets, values, calldatas, description);
 
@@ -151,13 +147,11 @@ contract GrantsGovernor is
     // ── OZ Governor overrides ─────────────────────────────────────────────────
 
     /// @dev Records a Voted action in the Earner after every successful vote.
-    function _castVote(
-        uint256 proposalId,
-        address account,
-        uint8 support,
-        string memory reason,
-        bytes memory params
-    ) internal override returns (uint256 weight) {
+    function _castVote(uint256 proposalId, address account, uint8 support, string memory reason, bytes memory params)
+        internal
+        override
+        returns (uint256 weight)
+    {
         weight = super._castVote(proposalId, account, support, reason, params);
         // Only reward votes that actually carried voting power (GD-16) — otherwise an
         // account with zero GRANT could earn tokens for free by voting on every proposal.
@@ -179,21 +173,11 @@ contract GrantsGovernor is
         return super.proposalThreshold();
     }
 
-    function quorum(uint256 blockNumber)
-        public
-        view
-        override(Governor, GovernorVotesQuorumFraction)
-        returns (uint256)
-    {
+    function quorum(uint256 blockNumber) public view override(Governor, GovernorVotesQuorumFraction) returns (uint256) {
         return super.quorum(blockNumber);
     }
 
-    function state(uint256 proposalId)
-        public
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (ProposalState)
-    {
+    function state(uint256 proposalId) public view override(Governor, GovernorTimelockControl) returns (ProposalState) {
         return super.state(proposalId);
     }
 
@@ -250,12 +234,7 @@ contract GrantsGovernor is
         return super._cancel(targets, values, calldatas, descriptionHash);
     }
 
-    function _executor()
-        internal
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (address)
-    {
+    function _executor() internal view override(Governor, GovernorTimelockControl) returns (address) {
         return super._executor();
     }
 }

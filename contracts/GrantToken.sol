@@ -46,12 +46,7 @@ contract GrantToken is ERC20Votes, AccessControlDefaultAdminRules, IGrantToken {
     }
 
     /// @inheritdoc IGrantToken
-    function getPastTotalSupply(uint256 timepoint)
-        public
-        view
-        override(Votes, IGrantToken)
-        returns (uint256)
-    {
+    function getPastTotalSupply(uint256 timepoint) public view override(Votes, IGrantToken) returns (uint256) {
         return super.getPastTotalSupply(timepoint);
     }
 

@@ -93,11 +93,7 @@ contract GrantsTreasury is ReentrancyGuardTransient, IGrantsTreasury {
     }
 
     /// @inheritdoc IGrantsTreasury
-    function pendingWithdrawal(address grantee, uint256 grantId, uint8 milestone)
-        external
-        view
-        returns (uint256)
-    {
+    function pendingWithdrawal(address grantee, uint256 grantId, uint8 milestone) external view returns (uint256) {
         return _pending[grantee][grantId][milestone];
     }
 }

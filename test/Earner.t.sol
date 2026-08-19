@@ -52,9 +52,7 @@ contract EarnerTest is Test {
         vm.startPrank(recorder);
         earner.recordAction(alice, 1, IEarner.Action.Voted);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(IEarner.AlreadyRecorded.selector, alice, 1, IEarner.Action.Voted)
-        );
+        vm.expectRevert(abi.encodeWithSelector(IEarner.AlreadyRecorded.selector, alice, 1, IEarner.Action.Voted));
         earner.recordAction(alice, 1, IEarner.Action.Voted);
         vm.stopPrank();
     }

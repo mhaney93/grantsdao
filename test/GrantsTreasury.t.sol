@@ -72,9 +72,7 @@ contract GrantsTreasuryTest is Test {
         uint256 grantId = _submitGrant(1_000_000e18);
 
         vm.prank(timelock);
-        vm.expectRevert(
-            abi.encodeWithSelector(IGrantsTreasury.InsufficientBalance.selector, 10 ether, 1000 ether)
-        );
+        vm.expectRevert(abi.encodeWithSelector(IGrantsTreasury.InsufficientBalance.selector, 10 ether, 1000 ether));
         treasury.releaseMilestone(grantId, 0, grantee, 1_000_000e18);
     }
 

@@ -63,29 +63,20 @@ contract GrantRegistry is AccessControlDefaultAdminRules, IGrantRegistry {
     }
 
     /// @inheritdoc IGrantRegistry
-    function linkProposal(uint256 grantId, uint256 governorProposalId)
-        external
-        onlyRole(GOVERNOR_ROLE)
-    {
+    function linkProposal(uint256 grantId, uint256 governorProposalId) external onlyRole(GOVERNOR_ROLE) {
         _requireExists(grantId);
         _grants[grantId].governorProposalId = governorProposalId;
     }
 
     /// @inheritdoc IGrantRegistry
-    function updateStatus(uint256 grantId, GrantStatus status)
-        external
-        onlyRole(GOVERNOR_ROLE)
-    {
+    function updateStatus(uint256 grantId, GrantStatus status) external onlyRole(GOVERNOR_ROLE) {
         _requireExists(grantId);
         _grants[grantId].status = status;
         emit GrantStatusUpdated(grantId, status);
     }
 
     /// @inheritdoc IGrantRegistry
-    function markMilestoneReleased(uint256 grantId, uint8 milestoneIndex)
-        external
-        onlyRole(TREASURY_ROLE)
-    {
+    function markMilestoneReleased(uint256 grantId, uint8 milestoneIndex) external onlyRole(TREASURY_ROLE) {
         _requireExists(grantId);
         Grant storage g = _grants[grantId];
 
@@ -99,7 +90,10 @@ contract GrantRegistry is AccessControlDefaultAdminRules, IGrantRegistry {
         // Mark grant Completed when every milestone is released.
         bool allReleased = true;
         for (uint256 i; i < g.milestones.length; ++i) {
-            if (!g.milestones[i].released) { allReleased = false; break; }
+            if (!g.milestones[i].released) {
+                allReleased = false;
+                break;
+            }
         }
         if (allReleased) {
             g.status = GrantStatus.Completed;

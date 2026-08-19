@@ -123,8 +123,7 @@ contract GrantsGovernorTest is Test {
         targets[0] = address(treasury);
         values = new uint256[](1);
         calldatas = new bytes[](1);
-        calldatas[0] =
-            abi.encodeCall(IGrantsTreasury.releaseMilestone, (grantId, milestone, grant.grantee, usdSlice));
+        calldatas[0] = abi.encodeCall(IGrantsTreasury.releaseMilestone, (grantId, milestone, grant.grantee, usdSlice));
     }
 
     /// @dev Full happy path: submit -> propose -> vote -> queue -> execute -> withdraw.
@@ -292,9 +291,7 @@ contract GrantsGovernorTest is Test {
         uint256 firstProposalId = governor.proposeGrantRelease(grantId, 0, "Release milestone 1");
 
         vm.prank(voter1);
-        vm.expectRevert(
-            abi.encodeWithSelector(IGrantsGovernor.ActiveMilestoneProposalExists.selector, firstProposalId)
-        );
+        vm.expectRevert(abi.encodeWithSelector(IGrantsGovernor.ActiveMilestoneProposalExists.selector, firstProposalId));
         governor.proposeGrantRelease(grantId2, 0, "Release milestone 1 (grant 2)");
     }
 
