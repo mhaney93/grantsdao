@@ -1,0 +1,374 @@
+<title>Open Grant Explorer</title>
+<style>
+  :root {
+    --bg: #f5f7f4;
+    --surface: #ffffff;
+    --surface-sunken: #eef1ec;
+    --ink: #1a201b;
+    --muted: #57614f;
+    --faint: #8b9484;
+    --border: #dbe2d6;
+    --accent: #1f6e52;
+    --accent-ink: #0f4936;
+    --accent-soft: #e4efe6;
+    --shadow: 0 1px 2px rgba(20, 30, 20, 0.04), 0 8px 24px -12px rgba(20, 30, 20, 0.12);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10140f;
+      --surface: #161c14;
+      --surface-sunken: #1d241a;
+      --ink: #e8ece3;
+      --muted: #a5b09b;
+      --faint: #69725f;
+      --border: #2b3325;
+      --accent: #5fbf94;
+      --accent-ink: #bdeed3;
+      --accent-soft: #1c2b21;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #10140f;
+    --surface: #161c14;
+    --surface-sunken: #1d241a;
+    --ink: #e8ece3;
+    --muted: #a5b09b;
+    --faint: #69725f;
+    --border: #2b3325;
+    --accent: #5fbf94;
+    --accent-ink: #bdeed3;
+    --accent-soft: #1c2b21;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Charter, "Iowan Old Style", "Georgia", "Cambria", serif;
+    line-height: 1.55;
+    margin: 0;
+    padding: 4rem 1.5rem 6rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--accent-ink); }
+
+  .sheet {
+    max-width: 46rem;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .sheet-inner {
+    padding: 3rem clamp(1.5rem, 5vw, 3.5rem) 3.25rem;
+  }
+
+  .eyebrow-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 1.75rem;
+  }
+
+  h1 {
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 0.6rem;
+    font-weight: 600;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .tagline {
+    font-size: 1.08rem;
+    color: var(--muted);
+    margin: 0 0 2rem;
+    max-width: 34rem;
+    text-wrap: balance;
+  }
+
+  .meta-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+  }
+
+  .meta-cell {
+    background: var(--surface-sunken);
+    padding: 0.85rem 1rem;
+  }
+
+  .meta-cell .label {
+    display: block;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 0.3rem;
+  }
+
+  .meta-cell .value {
+    font-size: 1.05rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  section { margin-bottom: 2.5rem; }
+  section:last-of-type { margin-bottom: 0; }
+
+  h2 {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  p { margin: 0 0 1rem; max-width: 38rem; }
+  p:last-child { margin-bottom: 0; }
+
+  .ledger {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .ledger th {
+    text-align: left;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 500;
+    padding: 0 0.75rem 0.6rem 0;
+  }
+
+  .ledger th.num, .ledger td.num { text-align: right; }
+
+  .ledger td {
+    padding: 0.85rem 0.75rem 0.85rem 0;
+    border-top: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .ledger tr:first-of-type td { border-top: 1px solid var(--border); }
+
+  .m-index {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    color: var(--faint);
+    font-size: 0.85rem;
+  }
+
+  .m-desc { font-size: 0.98rem; }
+  .m-desc .sub { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 0.2rem; }
+
+  .pct {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.92rem;
+  }
+
+  .ledger tfoot td {
+    border-top: 2px solid var(--ink);
+    font-weight: 600;
+    padding-top: 0.9rem;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem 2rem;
+  }
+
+  .team-item .label {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--faint);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .team-item .value {
+    font-size: 0.98rem;
+  }
+
+  .addr {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    word-break: break-all;
+  }
+
+  footer {
+    padding: 1.4rem clamp(1.5rem, 5vw, 3.5rem);
+    background: var(--surface-sunken);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    color: var(--faint);
+    letter-spacing: 0.02em;
+  }
+
+  footer .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--accent-ink);
+  }
+
+  footer .stamp::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+  }
+
+  @media (max-width: 34rem) {
+    body { padding: 2rem 0.75rem 4rem; }
+    .meta-strip { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr; }
+    .ledger .sub { display: block; }
+  }
+</style>
+
+<div class="sheet">
+  <div class="sheet-inner">
+    <div class="eyebrow-row">
+      <span>Grant Proposal — Draft</span>
+      <span>GrantsDAO / Sepolia</span>
+    </div>
+
+    <h1>Open Grant Explorer</h1>
+    <p class="tagline">A public dashboard for tracking GrantsDAO's proposals, votes, and treasury activity — so anyone can see where community funds are going without running a node.</p>
+
+    <div class="meta-strip">
+      <div class="meta-cell">
+        <span class="label">Requested</span>
+        <span class="value">$6,000</span>
+      </div>
+      <div class="meta-cell">
+        <span class="label">Milestones</span>
+        <span class="value">3</span>
+      </div>
+      <div class="meta-cell">
+        <span class="label">Est. duration</span>
+        <span class="value">6 weeks</span>
+      </div>
+    </div>
+
+    <section>
+      <h2>Summary</h2>
+      <p>Right now, understanding GrantsDAO activity means reading raw transaction logs or querying the contracts directly. This grant funds a public, no-login dashboard that surfaces proposal status, vote tallies, treasury balance, and grantee payout history in plain language — pulling directly from on-chain events, with no backend database to trust or maintain.</p>
+      <p>The goal is to lower the bar for community members who want to follow along or hold the DAO accountable, without needing to know how to read calldata.</p>
+    </section>
+
+    <section>
+      <h2>Milestones</h2>
+      <table class="ledger">
+        <thead>
+          <tr>
+            <th style="width: 2.5rem;">#</th>
+            <th>Deliverable</th>
+            <th class="num" style="width: 4rem;">Share</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="m-index">01</td>
+            <td class="m-desc">
+              Data layer
+              <span class="sub">Design the event schema and index historical grant, vote, and treasury activity into a queryable dataset.</span>
+            </td>
+            <td class="num pct">30%</td>
+          </tr>
+          <tr>
+            <td class="m-index">02</td>
+            <td class="m-desc">
+              Dashboard UI
+              <span class="sub">Build and deploy the public-facing dashboard — proposal status, treasury balance, and voting history views.</span>
+            </td>
+            <td class="num pct">40%</td>
+          </tr>
+          <tr>
+            <td class="m-index">03</td>
+            <td class="m-desc">
+              Docs &amp; handoff
+              <span class="sub">Write user and maintenance documentation, publish the live dashboard, and hand off source to the DAO.</span>
+            </td>
+            <td class="num pct">30%</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td></td>
+            <td>Total</td>
+            <td class="num pct">100%</td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+
+    <section>
+      <h2>Details</h2>
+      <div class="team-grid">
+        <div class="team-item">
+          <span class="label">Submitted by</span>
+          <span class="value addr">0xF7C6…9C43C</span>
+        </div>
+        <div class="team-item">
+          <span class="label">Category</span>
+          <span class="value">Public goods / tooling</span>
+        </div>
+        <div class="team-item">
+          <span class="label">Payout asset</span>
+          <span class="value">ETH, priced in USD at execution</span>
+        </div>
+        <div class="team-item">
+          <span class="label">Network</span>
+          <span class="value">Ethereum Sepolia (testnet)</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <span class="stamp">Milestone-gated release</span>
+    <span>Prepared for demonstration purposes</span>
+  </footer>
+</div>
